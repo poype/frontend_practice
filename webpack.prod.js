@@ -1,6 +1,7 @@
 const path = require('path');  // nodejs核心模块，专门用来处理路径问题
 const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     // entry要求用相对路径
@@ -21,7 +22,7 @@ module.exports = {
                 test: /\.css$/i, // 匹配的文件，只有.css文件才会使用下面的loader进行处理
                 use: [
                     // loader的执行顺序是从后到前执行，即css-loader先执行，style-loader后执行
-                    "style-loader",  // 在html文件中创建style标签，以便让js中的css生效
+                    MiniCssExtractPlugin.loader,  // 在html文件中创建style标签，以便让js中的css生效
                     "css-loader"  // 将css资源通过commonjs的方式打包到js中
                 ],
             },
@@ -29,7 +30,7 @@ module.exports = {
             {
                 test: /\.less$/i,
                 use: [
-                    "style-loader",
+                    MiniCssExtractPlugin.loader,
                     "css-loader",
                     "less-loader", // less-loader会将less先编译成css
                 ],
@@ -72,6 +73,9 @@ module.exports = {
         // 自动将打包好的js引入到html文件，html文件内容以public/index.html为模板
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "public/index.html")
+        }),
+        new MiniCssExtractPlugin({
+            filename: "css/main.css"
         })
     ],
 

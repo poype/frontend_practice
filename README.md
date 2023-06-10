@@ -19,3 +19,7 @@ eslint的配置文件有很多种写法，配置文件可以分别是.eslintrc,.
    npx webpack serve 命令用于启动这个server
    使用--config选项可以指定webpack的配置文件
    npx webpack serve --config ./webpack.dev.js
+
+5. css代码被打包到js文件中，会引发闪屏现象。因为要等js加载完之后才能渲染出css。
+   闪屏的用户体验很差，为了避免闪屏现象，需要将css代码提取到一个单独的css文件中。
+   这就要用到MiniCssExtractPlugin这个插件
