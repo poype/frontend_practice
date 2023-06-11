@@ -1,15 +1,12 @@
 module.exports = {
     // 继承eslint规则
-    extends: ['eslint:recommended'],
-    env: {
-        node: true,
-        browser: true
-    },
+    extends: ['react-app'],
     parserOptions: {
-        ecmaVersion: 6,
-        sourceType: "module",
+        babelOptions: {
+            presets: [
+                ["babel-preset-react-app", false],
+                "babel-preset-react-app/prod",
+            ]
+        }
     },
-    rules: {
-        "no-var": 2, // 不能使用 var 定义变量
-    }
 }

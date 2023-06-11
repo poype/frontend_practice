@@ -3,16 +3,17 @@ const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin'); // 自动将打包好的js引入到html文件
 const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // 提取css到一个单独的css文件
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); // 压缩css
+const CopyPlugin = require("copy-webpack-plugin");
 
 
 module.exports = {
     // entry要求用相对路径
-    entry: './src/main.js',
+    entry: './src/index.js',
 
     output: {
         // path要求用绝对路径，__dirname是nodejs中的一个变量，代表当前文件夹的路径
         path: path.resolve(__dirname, 'dist'),
-        filename: 'js/main.js',  // 这个filename指定的是js输入的文件名，或者是入口文件打包输出的文件名
+        filename: 'js/index.[contenthash:10].js',  // 这个filename指定的是js输入的文件名，或者是入口文件打包输出的文件名
         clean: true  // 自动清空上次的打包结果
     }, 
     
@@ -44,7 +45,7 @@ module.exports = {
                 type: "asset",
                 parser: {
                     dataUrlCondition: {
-                        maxSize: 50 * 1024  // 小于50KB的图片转换成base64
+                        maxSize: 10 * 1024  // 小于50KB的图片转换成base64
                     }
                 },
                 generator: {
@@ -54,14 +55,9 @@ module.exports = {
             },
             // babel loader
             {
-                test: /\.js$/,
+                test: /\.jsx?$/,
                 exclude: /node_modules/,
-                loader: "babel-loader",
-                options: {
-                    presets: [
-                        ['@babel/preset-env', { targets: "ie 11" }] // 将ES6代码编译长支持ie 11的代码
-                    ]
-                }
+                loader: "babel-loader"
             },
         ],
     },
@@ -70,17 +66,38 @@ module.exports = {
         // eslint在webpack5中是作为一个插件使用
         new ESLintPlugin({
             // 指定需要eslint检查的文件
-            context: path.resolve(__dirname, "src")
+            context: path.resolve(__dirname, "src"),
+            exclude: "node_modules",
+            cache: true,
+            cacheLocation: path.resolve(__dirname, "./node_modules/.cache/.eslintcache")
         }),
         // 自动将打包好的js引入到html文件，html文件内容以public/index.html为模板
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "public/index.html")
         }),
         new MiniCssExtractPlugin({
-            filename: "css/main.css"
+            filename: "css/index.css"
         }),
         new CssMinimizerPlugin(),
+        // 把public目录下的资源copy到dist下
+        new CopyPlugin({
+            patterns: [
+                { 
+                    from: path.resolve(__dirname, "./public"), 
+                    to: path.resolve(__dirname, "./dist"),
+                    globOptions: {
+                        // 忽略index.html文件
+                        ignore: ["**/index.html"]
+                    } 
+                }
+            ]
+        })
     ],
+
+    // 自动解析文件后缀名
+    resolve: {
+        extensions: [".jsx", ".js", ".json"]
+    },
 
     mode: "production"
 };

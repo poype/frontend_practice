@@ -5,12 +5,12 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
     // entry要求用相对路径
-    entry: './src/main.js',
+    entry: './src/index.js',
 
     output: {
         // 开发模式可以没有文件输出，所以可以将path设定为undefined
         path: undefined,
-        filename: 'js/main.js',  // 这个filename指定的是js输入的文件名，或者是入口文件打包输出的文件名
+        filename: 'js/index.js',  // 这个filename指定的是js输入的文件名，或者是入口文件打包输出的文件名
     }, 
     
     // loader
@@ -41,7 +41,7 @@ module.exports = {
                 type: "asset",
                 parser: {
                     dataUrlCondition: {
-                        maxSize: 50 * 1024  // 小于50KB的图片转换成base64
+                        maxSize: 10 * 1024  // 小于50KB的图片转换成base64
                     }
                 },
                 generator: {
@@ -51,14 +51,9 @@ module.exports = {
             },
             // babel loader
             {
-                test: /\.js$/,
+                test: /\.jsx?$/,
                 exclude: /node_modules/,
-                loader: "babel-loader",
-                options: {
-                    presets: [
-                        ['@babel/preset-env', { targets: "ie 11" }] // 将ES6代码编译长支持ie 11的代码
-                    ]
-                }
+                loader: "babel-loader"
             },
         ],
     },
@@ -67,14 +62,17 @@ module.exports = {
         // eslint在webpack5中是作为一个插件使用
         new ESLintPlugin({
             // 指定需要eslint检查的文件
-            context: path.resolve(__dirname, "src")
+            context: path.resolve(__dirname, "src"),
+            exclude: "node_modules",
+            cache: true,
+            cacheLocation: path.resolve(__dirname, "./node_modules/.cache/.eslintcache")
         }),
         // 自动将打包好的js引入到html文件，html文件内容以public/index.html为模板
         new HtmlWebpackPlugin({
             template: path.resolve(__dirname, "public/index.html")
         }),
         new MiniCssExtractPlugin({
-            filename: "css/main.css"
+            filename: "css/index.css"
         })
     ],
 
@@ -84,6 +82,11 @@ module.exports = {
         host: "localhost",
         port: "3000",
         open: true // 是否自动打开浏览器
+    },
+
+    // 自动解析文件后缀名
+    resolve: {
+        extensions: [".jsx", ".js", ".json"]
     },
 
     mode: "development",
