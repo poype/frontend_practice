@@ -1,7 +1,9 @@
 const path = require('path');  // nodejs核心模块，专门用来处理路径问题
 const ESLintPlugin = require('eslint-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin'); // 自动将打包好的js引入到html文件
+const MiniCssExtractPlugin = require("mini-css-extract-plugin"); // 提取css到一个单独的css文件
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin"); // 压缩css
+
 
 module.exports = {
     // entry要求用相对路径
@@ -76,7 +78,8 @@ module.exports = {
         }),
         new MiniCssExtractPlugin({
             filename: "css/main.css"
-        })
+        }),
+        new CssMinimizerPlugin(),
     ],
 
     mode: "production"
